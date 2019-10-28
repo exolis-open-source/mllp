@@ -15,22 +15,22 @@ var CR = String.fromCharCode(0x0d);
  * @param {string} host a resolvable hostname or IP Address
  * @param {integer} port a valid free port for the server to listen on.
  * @param {object} logger
- * 
- * @fires MLLPServer#hl7  
- * 
+ *
+ * @fires MLLPServer#hl7
+ *
  * @example
  * var server = new MLLPServer('hl7server.mydomain', 3333, console.log);
- * 
+ *
  * server.on('hl7', function(message) {
  *  console.log("Message: " + message);
  *  // INSERT Unmarshalling or Processing here
  * });
- * 
+ *
  * @example
  * <caption>An ACK is sent back to the server</caption>
  *  MSH|^~\&|SOMELAB|SOMELAB|SOMELAB|SOMELAB|20080511103530||ORU^R01|Q335939501T337311002|P|2.3|||
  *  MSA|AA|Q335939501T337311002
- * 
+ *
  */
 function MLLPServer(host, port, logger) {
 
@@ -84,9 +84,13 @@ function MLLPServer(host, port, logger) {
                  * @property {string} message string containing the HL7 Message (see example below)
                  * @example MSH|^~\&|XXXX|C|SOMELAB|SOMELAB|20080511103530||ORU^R01|Q335939501T337311002|P|2.3|||
                  */
-                self.emit('hl7', self.message);
-                var ack = ackn(data2, "AA");
-                sock.write(VT + ack + FS + CR);
+                self.emit('hl7', {
+                    message: self.message,
+                    callback: function (ack_type) {
+                        var ack = ackn(data2, ack_type);
+                        sock.write(VT + ack + FS + CR);
+                    }
+                });
             }
 
         });
