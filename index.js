@@ -32,7 +32,7 @@ var CR = String.fromCharCode(0x0d);
  *  MSA|AA|Q335939501T337311002
  *
  */
-function MLLPServer(host, port, logger) {
+function MLLPServer(host, port, encoding, logger) {
 
     var self = this;
     this.message = '';
@@ -43,6 +43,10 @@ function MLLPServer(host, port, logger) {
     var Server = net.createServer(function (sock) {
 
         logger('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+        if (encoding) {
+            sock.setEncoding(encoding);
+            logger('ENCODING: ' + encoding);
+        }
 
         function ackn(data, ack_type) {
             //get message ID
